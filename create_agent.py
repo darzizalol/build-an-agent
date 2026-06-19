@@ -7,6 +7,10 @@ import io
 
 from langchain.agents import create_agent
 from langchain_core.tools import tool
+from pathlib import Path
+
+skills_dir = Path(__file__).resolve().parent / "skills"
+system_prompt = "\n\n".join(p.read_text() for p in sorted(skills_dir.rglob("*.md")))
 
 rows = [
     ["Date", "Product", "Units", "Revenue"],
@@ -25,7 +29,7 @@ def read_file(path: str) -> str:
     with open(path, "r") as f:
         return f.read()
 
-agent = create_agent("anthropic:claude-haiku-4-5", tools=[read_file])
+agent = create_agent("anthropic:claude-haiku-4-5", tools=[read_file], system_prompt=system_prompt)
 
 stream = agent.stream_events(
     {
